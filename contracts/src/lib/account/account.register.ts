@@ -1,5 +1,5 @@
 export namespace AccountRegister {
-  const topic = 'account.login.command';
+  export const topic = 'account.login.command';
 
   export class Request {
     email: string;

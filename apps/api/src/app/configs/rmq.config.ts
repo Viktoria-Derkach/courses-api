@@ -4,7 +4,7 @@ import { IRMQServiceAsyncOptions } from 'nestjs-rmq';
 export const getRMQConfig = (): IRMQServiceAsyncOptions => ({
   inject: [ConfigService],
   imports: [ConfigModule],
-  useFactory: (configService) => ({
+  useFactory: (configService: ConfigService) => ({
     exchangeName: configService.get('AMQP_EXCHANGE') ?? '',
     connections: [
       {
@@ -13,7 +13,6 @@ export const getRMQConfig = (): IRMQServiceAsyncOptions => ({
         host: configService.get('AMQP_HOSTNAME') ?? '',
       },
     ],
-    queueName: configService.get('AMQP_QUEUE'),
     prefetchCount: 32,
     serviceName: 'purple-account',
   }),

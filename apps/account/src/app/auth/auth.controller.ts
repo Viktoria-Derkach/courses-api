@@ -15,7 +15,7 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
-  @RMQValidate()
+  // @RMQValidate()
   @RMQRoute(AccountLogin.topic)
   async login(
     @Body() { email, password }: AccountLogin.Request

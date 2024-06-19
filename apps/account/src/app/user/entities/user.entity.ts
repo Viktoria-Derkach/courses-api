@@ -8,6 +8,7 @@ export class UserEntity implements IUser {
   passwordHash: string;
   role: UserRole;
   courses: IUserCourses[];
+  street?: string;
 
   constructor(user: IUser) {
     this._id = user._id;
@@ -16,6 +17,7 @@ export class UserEntity implements IUser {
     this.email = user.email;
     this.role = user.role;
     this.courses = user.courses;
+    this.street = user.street;
   }
 
   public async setPassword(password: string) {

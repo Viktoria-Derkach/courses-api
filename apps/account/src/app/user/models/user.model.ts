@@ -27,6 +27,9 @@ export class User extends Document implements IUser {
   @Prop()
   displayName?: string;
 
+  @Prop()
+  street?: string;
+
   @Prop({ required: true })
   email: string;
 

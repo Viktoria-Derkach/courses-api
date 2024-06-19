@@ -16,6 +16,7 @@ export interface IUser {
   passwordHash: string;
   role: UserRole;
   courses?: IUserCourses[];
+  street?: string;
 }
 
 export interface IUserCourses {

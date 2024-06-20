@@ -3,26 +3,31 @@ import {
   AccountLogin,
   AccountRegister,
   AccountUserInfo,
-  AccountChangeInfo,
+  AccountChangeProfile,
 } from '@purple/contracts';
 import { RMQRoute, RMQValidate } from 'nestjs-rmq';
 import { UserRepository } from './repositories/user.repository';
+import { UserEntity } from './entities/user.entity';
 
 @Controller()
 export class UserCommands {
   constructor(private readonly userRepository: UserRepository) {}
+
   @RMQValidate()
-  @RMQRoute(AccountChangeInfo.topic)
+  @RMQRoute(AccountChangeProfile.topic)
   async userInfo(
-    @Body() dto: AccountChangeInfo.Request
-  ): Promise<AccountChangeInfo.Response> {
-    const { id, ...updateData } = dto;
-    const user = await this.userRepository.findUserById(id);
-    if (!user) {
+    @Body() { user, id }: AccountChangeProfile.Request
+  ): Promise<AccountChangeProfile.Response> {
+    const existedUser = await this.userRepository.findUserById(id);
+    if (!existedUser) {
       throw new Error('There is no such user');
     }
 
-    await this.userRepository.updateUser(id, updateData);
+    const userEntity = new UserEntity(existedUser).updateProfile(
+      user.displayName
+    );
+
+    await this.userRepository.updateUser(userEntity);
 
     return {};
   }

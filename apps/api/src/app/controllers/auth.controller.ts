@@ -7,7 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {
-  AccountChangeInfo,
+  AccountChangeProfile,
   AccountLogin,
   AccountRegister,
 } from '@purple/contracts';
@@ -52,9 +52,9 @@ export class AuthController {
   async changeInfo(@Param('id') id: string, @Body() dto: ChangeInfoDto) {
     try {
       return await this.rmqService.send<
-        AccountChangeInfo.Request,
-        AccountChangeInfo.Response
-      >(AccountChangeInfo.topic, { id, ...dto });
+        AccountChangeProfile.Request,
+        AccountChangeProfile.Response
+      >(AccountChangeProfile.topic, { user: { ...dto }, id });
     } catch (e) {
       if (e instanceof Error) {
         throw new UnauthorizedException(e.message);

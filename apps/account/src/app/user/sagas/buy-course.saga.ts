@@ -28,7 +28,7 @@ export class BuyCourseSaga {
 
     // context
     this.state.setContext(this);
-    this.user.updateCourseStatus(courseId, state);
+    this.user.setCourseStatus(courseId, state);
   }
 
   getState() {

@@ -25,22 +25,20 @@ export class UserEntity implements IUser {
     this.street = user.street;
   }
 
-  public addCourse(courseId: string) {
+  public setCourseStatus(courseId: string, state: PurchaseState) {
     const exist = this.courses.find((c) => c._id === courseId);
-    if (exist) {
-      throw new Error('This course already exist');
+    if (!exist) {
+      this.courses.push({
+        courseId,
+        purchaseState: state,
+      });
+      return this;
     }
-    this.courses.push({
-      courseId,
-      purchaseState: PurchaseState.Started,
-    });
-  }
 
-  public deleteCourse(courseId: string) {
-    this.courses = this.courses.filter((c) => c._id !== courseId);
-  }
+    if (state === PurchaseState.Cenceled) {
+      this.courses = this.courses.filter((c) => c._id !== courseId);
+    }
 
-  public updateCourseStatus(courseId: string, state: PurchaseState) {
     this.courses = this.courses.map((c) => {
       if (c._id === courseId) {
         c.purchaseState = state;
@@ -48,6 +46,7 @@ export class UserEntity implements IUser {
       }
       return c;
     });
+    return this;
   }
 
   public getPublicProfile() {

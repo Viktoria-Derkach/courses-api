@@ -12,11 +12,7 @@ export class UserCourses extends Document implements IUserCourses {
   @Prop({ required: true })
   courseId: string;
 
-  @Prop({
-    required: true,
-    enum: PurchaseState,
-    type: String,
-  })
+  @Prop({ required: true, enum: PurchaseState, type: String })
   purchaseState: PurchaseState;
 }
 
@@ -26,9 +22,6 @@ export const UserCoursesSchema = SchemaFactory.createForClass(UserCourses);
 export class User extends Document implements IUser {
   @Prop()
   displayName?: string;
-
-  @Prop()
-  street?: string;
 
   @Prop({ required: true })
   email: string;
@@ -44,10 +37,7 @@ export class User extends Document implements IUser {
   })
   role: UserRole;
 
-  @Prop({
-    type: [UserCoursesSchema],
-    _id: false,
-  })
+  @Prop({ type: [UserCoursesSchema], _id: false })
   courses: Types.Array<UserCourses>;
 }
 

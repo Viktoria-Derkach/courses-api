@@ -12,8 +12,7 @@ export class UserEntity implements IUser {
   email: string;
   passwordHash: string;
   role: UserRole;
-  courses: IUserCourses[];
-  street?: string;
+  courses?: IUserCourses[];
 
   constructor(user: IUser) {
     this._id = user._id;
@@ -22,7 +21,6 @@ export class UserEntity implements IUser {
     this.email = user.email;
     this.role = user.role;
     this.courses = user.courses;
-    this.street = user.street;
   }
 
   public setCourseStatus(courseId: string, state: PurchaseState) {

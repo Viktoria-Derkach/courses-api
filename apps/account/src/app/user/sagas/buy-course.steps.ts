@@ -44,20 +44,11 @@ export class BuyCourseSagaStateStarted extends BuyCourseSagaState {
     return { user: this.saga.user };
   }
 }
-export class BuyCourseSagaStateProcess extends BuyCourseSagaState {
+export class BuyCourseSagaStateWaitingForPayments extends BuyCourseSagaState {
   public pay(): Promise<{ paymentLink: string; user: UserEntity }> {
     throw new Error('Payment has been started.');
   }
   public async checkPayment(): Promise<{ user: UserEntity }> {
-    const { course } = await this.saga.rmqService.send<
-      CourseGetCourse.Request,
-      CourseGetCourse.Response
-    >(CourseGetCourse.topic, { id: this.saga.courseId });
-
-    if (!course) {
-      throw new Error('There is no such course');
-    }
-
     const { status } = await this.saga.rmqService.send<
       PaymentCheck.Request,
       PaymentCheck.Response
@@ -66,17 +57,16 @@ export class BuyCourseSagaStateProcess extends BuyCourseSagaState {
       userId: this.saga.user._id,
     });
 
-    if (status === 'success') {
-      this.saga.setState(PurchaseState.Purchased, course._id);
-    }
-
     if (status === 'canceled') {
-      this.saga.setState(PurchaseState.Cenceled, course._id);
+      this.saga.setState(PurchaseState.Cenceled, this.saga.courseId);
+      return { user: this.saga.user };
     }
 
-    if (status === 'progress') {
-      this.saga.setState(PurchaseState.WaitingForPayment, course._id);
+    if (status !== 'success') {
+      return { user: this.saga.user };
     }
+
+    this.saga.setState(PurchaseState.Purchased, this.saga.courseId);
 
     return { user: this.saga.user };
   }
@@ -85,41 +75,13 @@ export class BuyCourseSagaStateProcess extends BuyCourseSagaState {
   }
 }
 
-export class BuyCourseSagaStateFinished extends BuyCourseSagaState {
+export class BuyCourseSagaStatePurchased extends BuyCourseSagaState {
   public pay(): Promise<{ paymentLink: string; user: UserEntity }> {
     throw new Error('Payment has been finished.');
   }
+
   public async checkPayment(): Promise<{ user: UserEntity }> {
-    const { course } = await this.saga.rmqService.send<
-      CourseGetCourse.Request,
-      CourseGetCourse.Response
-    >(CourseGetCourse.topic, { id: this.saga.courseId });
-
-    if (!course) {
-      throw new Error('There is no such course');
-    }
-
-    const { status } = await this.saga.rmqService.send<
-      PaymentCheck.Request,
-      PaymentCheck.Response
-    >(PaymentCheck.topic, {
-      courseId: this.saga.courseId,
-      userId: this.saga.user._id,
-    });
-
-    if (status === 'success') {
-      this.saga.setState(PurchaseState.Purchased, course._id);
-    }
-
-    if (status === 'canceled') {
-      this.saga.setState(PurchaseState.Cenceled, course._id);
-    }
-
-    if (status === 'progress') {
-      this.saga.setState(PurchaseState.WaitingForPayment, course._id);
-    }
-
-    return { user: this.saga.user };
+    throw new Error('You cannot check payment');
   }
   public cencel(): Promise<{ user: UserEntity }> {
     throw new Error('You cannot cancel');
@@ -128,7 +90,8 @@ export class BuyCourseSagaStateFinished extends BuyCourseSagaState {
 
 export class BuyCourseSagaStateCanceled extends BuyCourseSagaState {
   public pay(): Promise<{ paymentLink: string; user: UserEntity }> {
-    throw new Error('You cannot pay.');
+    this.saga.setState(PurchaseState.Started, this.saga.courseId);
+    return this.saga.getState().pay();
   }
   public checkPayment(): Promise<{ user: UserEntity }> {
     throw new Error('No check.');

@@ -4,6 +4,8 @@ import {
   AccountRegister,
   AccountUserInfo,
   AccountChangeProfile,
+  AccountBuyCourse,
+  AccountCheckPayment,
 } from '@purple/contracts';
 import { RMQRoute, RMQValidate } from 'nestjs-rmq';
 import { UserRepository } from './repositories/user.repository';
@@ -31,4 +33,16 @@ export class UserCommands {
 
     return {};
   }
+
+  @RMQValidate()
+  @RMQRoute(AccountBuyCourse.topic)
+  async buyCourse(
+    @Body() { userId, courseId }: AccountBuyCourse.Request
+  ): Promise<AccountBuyCourse.Response> {}
+
+  @RMQValidate()
+  @RMQRoute(AccountCheckPayment.topic)
+  async checkPayment(
+    @Body() { userId, courseId }: AccountCheckPayment.Request
+  ): Promise<AccountCheckPayment.Response> {}
 }

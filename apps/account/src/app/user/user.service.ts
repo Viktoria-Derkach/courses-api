@@ -3,6 +3,8 @@ import { IUser } from '@purple/interfaces';
 import { UserEntity } from './entities/user.entity';
 import { BuyCourseSaga } from './sagas/buy-course.saga';
 import { UserEventEmmiter } from './user.event-emmiter';
+import { UserRepository } from './repositories/user.repository';
+import { RMQService } from 'nestjs-rmq';
 
 @Injectable()
 export class UserService {

@@ -9,10 +9,12 @@ import { INestApplication } from '@nestjs/common';
 import { UserRepository } from '../user/repositories/user.repository';
 import {
   AccountBuyCourse,
+  AccountCheckPayment,
   AccountLogin,
   AccountRegister,
   AccountUserInfo,
   CourseGetCourse,
+  PaymentCheck,
   PaymentGenerateLink,
 } from '@purple/contracts';
 import { verify } from 'jsonwebtoken';
@@ -109,32 +111,19 @@ describe('UserController', () => {
     ).rejects.toThrowError();
   });
 
-  // it('BuyCourse', async () => {
-  //   const paymentLink = 'paymentLink';
-  //   rmqService.mockReply<CourseGetCourse.Response>(CourseGetCourse.topic, {
-  //     course: {
-  //       _id: courseId,
-  //       price: 1000,
-  //     },
-  //   });
-  //   rmqService.mockReply<PaymentGenerateLink.Response>(
-  //     PaymentGenerateLink.topic,
-  //     {
-  //       paymentLink,
-  //     }
-  //   );
-  //   const res = await rmqService.triggerRoute<
-  //     AccountBuyCourse.Request,
-  //     AccountBuyCourse.Response
-  //   >(AccountBuyCourse.topic, { userId, courseId });
-  //   expect(res.paymentLink).toEqual(paymentLink);
-  //   await expect(
-  //     rmqService.triggerRoute<
-  //       AccountBuyCourse.Request,
-  //       AccountBuyCourse.Response
-  //     >(AccountBuyCourse.topic, { userId, courseId })
-  //   ).rejects.toThrowError();
-  // });
+  it('Check payments', async () => {
+    rmqService.mockReply<PaymentCheck.Response>(PaymentCheck.topic, {
+      status: 'success',
+    });
+
+    const res = await rmqService.triggerRoute<
+      AccountCheckPayment.Request,
+      AccountCheckPayment.Response
+    >(AccountCheckPayment.topic, { userId, courseId });
+
+    expect(res.status).toEqual('success');
+
+  });
 
   afterAll(async () => {
     await userRepository.deleteUser(authRegister.email);

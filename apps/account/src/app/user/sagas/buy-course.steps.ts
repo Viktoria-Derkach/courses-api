@@ -66,7 +66,7 @@ export class BuyCourseSagaStateWaitingForPayments extends BuyCourseSagaState {
       return { user: this.saga.user, status: 'canceled' };
     }
 
-    if (status !== 'success') {
+    if (status === 'success') {
       return { user: this.saga.user, status: 'success' };
     }
 

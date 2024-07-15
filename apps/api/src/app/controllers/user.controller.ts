@@ -11,7 +11,7 @@ export class UserController {
   @Post('info')
   async info(@UserId() userId: string) {}
 
-  @Cron('*/5 * * * * *')
+  @Cron('* * * * */5 *')
   async cron() {
     Logger.log('Done');
   }
